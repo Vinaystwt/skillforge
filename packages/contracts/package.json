@@ -1,0 +1,24 @@
+{
+  "name": "@skillforge/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "hardhat compile",
+    "test": "hardhat test",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "format": "prettier --check 'contracts/**/*.{sol,ts}' 'scripts/**/*.ts'"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.2.0",
+    "dotenv": "^16.5.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.1.0",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@types/node": "^22.15.3",
+    "chai": "^4.5.0",
+    "ethers": "^6.14.4",
+    "hardhat": "^2.24.0",
+    "typescript": "^5.8.3"
+  }
+}
