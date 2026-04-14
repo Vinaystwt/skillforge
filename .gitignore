@@ -12,4 +12,4 @@ typechain-types
 !.env.example
 pnpm-lock.yaml
 out
-
+context.md
