@@ -1,6 +1,6 @@
 import Link from "next/link";
 import clsx from "clsx";
-import type { SkillListing } from "@skillforge/shared";
+import type { SkillListing } from "../lib/catalog";
 
 export function SkillCard({ skill, featured = false }: { skill: SkillListing; featured?: boolean }) {
   return (
@@ -49,4 +49,3 @@ export function SkillCard({ skill, featured = false }: { skill: SkillListing; fe
     </Link>
   );
 }
-

@@ -2,6 +2,12 @@
 
 SkillForge is an on-chain registry and paid execution layer for reusable AI agent skills on X Layer. Creators publish callable capabilities, attach pricing, and expose them as agent-ready endpoints. Consumers discover skills, route through paid invocation flows, and execute real actions backed by OKX Onchain OS capabilities.
 
+## Live Links
+- Live app: `https://web-six-iota-44.vercel.app`
+- Live API health: `https://web-six-iota-44.vercel.app/api/health`
+- Live marketplace API: `https://web-six-iota-44.vercel.app/api/marketplace`
+- Verified registry contract: `https://www.oklink.com/xlayer/address/0x1850d2a31CB8669Ba757159B638DE19Af532ba5e#code`
+
 ## What It Does
 - publishes reusable skills to an on-chain `SkillRegistry` on X Layer
 - exposes a backend gateway for discovery and invocation
@@ -31,6 +37,7 @@ Agent builders keep rebuilding the same execution primitives. SkillForge turns t
 - Deployer wallet: `0x94c188F8280cA706949CC030F69e42B5544514ac`
 - Agentic Wallet: `0x89740dfdc33b07242d1276ad453e00eb56c25884`
 - Registry contract: `0x1850d2a31CB8669Ba757159B638DE19Af532ba5e`
+- Contract verification: `OKLink verified`
 - Agentic Wallet funding swap tx: `0x0d6da5ea1cc77c0e6943d730d7392e9a99d04ac599ab8d850214f94b4837c2ba`
 
 ### Seed skill registration txs
@@ -49,6 +56,28 @@ packages/
   contracts/   Hardhat contract package and X Layer deploy scripts
   shared/      shared types, seeded skills, mock fallback data
 ```
+
+## Architecture Diagram
+```mermaid
+flowchart LR
+    A[Creator] -->|register skill| B[SkillRegistry on X Layer]
+    C[Agent or Human User] --> D[SkillForge Frontend]
+    D --> E[SkillForge API Routes]
+    E -->|read registry| B
+    E -->|402 challenge| C
+    C -->|payment replay| E
+    E -->|market / balance / token / quote calls| F[OKX Onchain OS + DEX APIs]
+    E -->|result + receipt| D
+    G[Agentic Wallet] -->|demo identity + wallet proof| D
+```
+
+## Why This Matters For X Layer
+SkillForge is not another single-purpose agent. It is the reusable capability layer agents can publish into and consume from. That makes it infrastructure for the X Layer agent economy:
+- discoverable skills
+- on-chain provenance
+- paid invocation
+- reusable execution primitives
+- clearer distribution for agent builders
 
 ## Current Skill Catalog
 1. `market-price-snapshot`
@@ -71,6 +100,12 @@ Pages:
 - `/dashboard` creator surface
 - `/demo` judge/demo flow
 
+The deployed app includes:
+- live marketplace pages
+- built-in serverless API routes under `/api/*`
+- interactive invoke panels on the skill and demo pages
+- x402-compatible payment challenge demo flow
+
 ## Backend Surface
 ### Health
 - `GET /health`
@@ -86,6 +121,13 @@ Pages:
 If a paid route is called without a payment header, the API returns:
 - `HTTP 402`
 - `PAYMENT-REQUIRED` header with an x402-compatible challenge payload
+
+In the live deployment these backend endpoints are served from the same Vercel app:
+- `/api/health`
+- `/api/marketplace`
+- `/api/marketplace/skills`
+- `/api/marketplace/skills/:slug`
+- `/api/skills/:slug/invoke`
 
 ## Environment
 Create a local `.env` based on `.env.example`.
@@ -151,11 +193,16 @@ pnpm --filter @skillforge/contracts exec hardhat run scripts/seed.ts --network x
 - contract test suite: passing
 - direct API function verification against live registry: passing
 - direct OKX-backed quote invocation: passing
+- production Vercel health endpoint: passing
+- production marketplace endpoint: passing
+- production 402 challenge flow: passing
+- production paid replay invoke flow: passing
+- contract explorer verification: passing
 
 ## Known Constraints
-- `x402` seller verification is implemented as a challenge surface for the hackathon MVP; production-grade settlement reconciliation should be extended with full proof verification and receipt persistence
-- local API port binding could not be validated inside the sandbox, so runtime verification used direct service execution instead
-- contract source verification on the explorer is not automated in this repo yet
+- `x402` seller verification is implemented as a challenge-compatible demo payment surface for the hackathon MVP; production-grade settlement reconciliation should still be extended with stronger proof storage and replay controls
+- live `safe-swap-execute` returns a guarded execution plan in the public deployment; final wallet-signed trade execution remains an operator-controlled path
+- local API port binding could not be validated inside the sandbox, so local runtime verification used direct service execution instead
 
 ## Positioning In X Layer Ecosystem
-SkillForge is not a single agent. It is the reusable capability layer agents can publish into and consume from. That positions it as infrastructure for the X Layer agent economy rather than a one-off workflow demo.
+SkillForge is infrastructure, not a one-off workflow demo. It gives X Layer a reusable registry and invocation surface for agent capabilities, which is materially more important for ecosystem growth than a single hardcoded bot path.

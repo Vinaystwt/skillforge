@@ -1,4 +1,4 @@
-import type { SkillActivity } from "@skillforge/shared";
+import type { SkillActivity } from "../lib/catalog";
 
 function statusTone(status: SkillActivity["status"]) {
   switch (status) {
@@ -52,4 +52,3 @@ export function ActivityFeed({ items }: { items: SkillActivity[] }) {
     </div>
   );
 }
-

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSkill } from "../../../lib/api";
+import { InvokePanel } from "../../../components/invoke-panel";
 
 export default async function SkillDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -42,6 +43,7 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
           </div>
         </div>
         <aside className="space-y-6">
+          <InvokePanel skill={skill} />
           <div className="rounded-[2rem] border border-white/10 bg-[rgba(12,12,10,0.86)] p-1 shadow-shell">
             <div className="rounded-[calc(2rem-4px)] border border-white/6 bg-[rgba(16,15,13,0.96)] p-6">
               <p className="text-[10px] uppercase tracking-[0.26em] text-dune/50">Invocation surface</p>
@@ -83,4 +85,3 @@ export default async function SkillDetailPage({ params }: { params: Promise<{ sl
     </main>
   );
 }
-

@@ -8,6 +8,7 @@ dotenv.config();
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const X_LAYER_RPC = process.env.X_LAYER_RPC ?? "https://rpc.xlayer.tech";
+const OKLINK_API_KEY = process.env.OKLINK_API_KEY ?? process.env.OKX_API_KEY ?? "";
 
 const accounts = PRIVATE_KEY ? [PRIVATE_KEY.startsWith("0x") ? PRIVATE_KEY : `0x${PRIVATE_KEY}`] : [];
 
@@ -36,14 +37,14 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      xlayer: "placeholder"
+      xlayer: OKLINK_API_KEY
     },
     customChains: [
       {
         network: "xlayer",
         chainId: 196,
         urls: {
-          apiURL: "https://www.oklink.com/api/v5/explorer/contract/verify-source-code-plugin/XLAYER_TESTNET",
+          apiURL: "https://www.oklink.com/api/v5/explorer/contract/verify-source-code-plugin/XLAYER",
           browserURL: "https://www.oklink.com/xlayer"
         }
       }

@@ -1,4 +1,5 @@
 import { getMarketplaceData } from "../../lib/api";
+import { InvokePanel } from "../../components/invoke-panel";
 
 export default async function DemoPage() {
   const marketplace = await getMarketplaceData();
@@ -51,6 +52,9 @@ export default async function DemoPage() {
             </div>
           </div>
         </div>
+      </section>
+      <section className="mt-12">
+        <InvokePanel skill={flagship} />
       </section>
     </main>
   );
