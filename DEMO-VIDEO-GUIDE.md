@@ -8,10 +8,10 @@ Open these tabs in your browser **before** you hit record. Arrange them left-to-
 
 | # | Tab | URL | Purpose |
 |---|-----|-----|---------|
-| 1 | **SkillForge Live** | `https://web-six-iota-44.vercel.app` | Primary demo surface — homepage with all 5 skills, activity feed, stats |
-| 2 | **Demo Page** | `https://web-six-iota-44.vercel.app/demo` | Guided judge flow — shows the flagship Safe Swap Execute pipeline with live proof hash |
-| 3 | **Skill Detail: Safe Swap Execute** | `https://web-six-iota-44.vercel.app/skill/safe-swap-execute` | Deep dive into the flagship skill — shows InvokePanel, creator stats, endpoint details |
-| 4 | **Skill Detail: Swap Route Quote** | `https://web-six-iota-44.vercel.app/skill/swap-route-quote` | Secondary skill to demonstrate invocation + x402 payment challenge flow live |
+| 1 | **SkillForge Live** | `https://skillforge-vinaystwts-projects.vercel.app` | Primary demo surface — homepage with all 5 skills, activity feed, stats |
+| 2 | **Demo Page** | `https://skillforge-vinaystwts-projects.vercel.app/demo` | Guided judge flow — shows the flagship Safe Swap Execute pipeline with live proof hash |
+| 3 | **Skill Detail: Safe Swap Execute** | `https://skillforge-vinaystwts-projects.vercel.app/skill/safe-swap-execute` | Deep dive into the flagship skill — shows InvokePanel, creator stats, endpoint details |
+| 4 | **Skill Detail: Swap Route Quote** | `https://skillforge-vinaystwts-projects.vercel.app/skill/swap-route-quote` | Secondary skill to demonstrate invocation + x402 payment challenge flow live |
 | 5 | **OKLink Explorer — Contract** | `https://www.oklink.com/xlayer/address/0x1850d2a31CB8669Ba757159B638DE19Af532ba5e#code` | On-chain verification — shows deployed SkillRegistry contract with verified source code |
 
 ### Optional Bonus Tab (if you want to show wallet state)

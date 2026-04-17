@@ -191,7 +191,7 @@ export default async function SkillDetailPage({
               <div>
                 <span style={{ color: "#6B7FFF" }}># 1. Request (expect 402)</span>
               </div>
-              <div>curl -X POST https://web-six-iota-44.vercel.app{skill.endpointPath} \</div>
+              <div>curl -X POST https://skillforge-vinaystwts-projects.vercel.app{skill.endpointPath} \</div>
               <div>  -H "Content-Type: application/json" \</div>
               <div>  -d &#123;"amount": "{skill.slug === "wallet-balance-check" ? "" : "0.001"}"&#125;</div>
               <div className="mt-3">

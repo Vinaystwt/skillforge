@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-const BASE_URL = "https://web-six-iota-44.vercel.app";
+const BASE_URL = "https://skillforge-vinaystwts-projects.vercel.app";
 
 const SKILLS_MANIFEST = {
   name: "SkillForge",

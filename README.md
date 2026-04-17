@@ -10,9 +10,9 @@ Every agent ecosystem rebuilds the same execution primitives — balance checks,
 
 | | |
 |---|---|
-| **App** | https://web-six-iota-44.vercel.app |
-| **Agent discovery endpoint** | https://web-six-iota-44.vercel.app/api/agent |
-| **Marketplace API** | https://web-six-iota-44.vercel.app/api/marketplace |
+| **App** | https://skillforge-vinaystwts-projects.vercel.app |
+| **Agent discovery endpoint** | https://skillforge-vinaystwts-projects.vercel.app/api/agent |
+| **Marketplace API** | https://skillforge-vinaystwts-projects.vercel.app/api/marketplace |
 | **Registry contract** | [0x1850d2a31... on OKLink](https://www.oklink.com/xlayer/address/0x1850d2a31CB8669Ba757159B638DE19Af532ba5e#code) |
 
 ---
@@ -111,7 +111,7 @@ Any agent can self-discover all available skills, their endpoints, prices, and t
 ### 1 — Discover skills
 
 ```bash
-curl https://web-six-iota-44.vercel.app/api/agent
+curl https://skillforge-vinaystwts-projects.vercel.app/api/agent
 ```
 
 Response includes:
@@ -127,7 +127,7 @@ Response headers: `X-MCP-Compatible: true`, `X-Registry: 0x1850d2a31...`, `X-Cha
 Step 1 — initial request returns HTTP 402 with payment challenge:
 
 ```bash
-curl -X POST https://web-six-iota-44.vercel.app/api/skills/market-price-snapshot/invoke \
+curl -X POST https://skillforge-vinaystwts-projects.vercel.app/api/skills/market-price-snapshot/invoke \
   -H "Content-Type: application/json" \
   -d '{"amount": "0.01"}'
 # → HTTP 402
@@ -137,7 +137,7 @@ curl -X POST https://web-six-iota-44.vercel.app/api/skills/market-price-snapshot
 Step 2 — resubmit with payment header:
 
 ```bash
-curl -X POST https://web-six-iota-44.vercel.app/api/skills/market-price-snapshot/invoke \
+curl -X POST https://skillforge-vinaystwts-projects.vercel.app/api/skills/market-price-snapshot/invoke \
   -H "Content-Type: application/json" \
   -H "X-Payment: <payment-header>" \
   -d '{"amount": "0.01"}'
@@ -148,7 +148,7 @@ curl -X POST https://web-six-iota-44.vercel.app/api/skills/market-price-snapshot
 ### 3 — Wallet balance check
 
 ```bash
-curl -X POST https://web-six-iota-44.vercel.app/api/skills/wallet-balance-check/invoke \
+curl -X POST https://skillforge-vinaystwts-projects.vercel.app/api/skills/wallet-balance-check/invoke \
   -H "Content-Type: application/json" \
   -H "X-Payment: <payment-header>" \
   -d '{"walletAddress": "0x89740dfdc33b07242d1276ad453e00eb56c25884"}'
@@ -157,7 +157,7 @@ curl -X POST https://web-six-iota-44.vercel.app/api/skills/wallet-balance-check/
 ### 4 — Safe swap (composed skill)
 
 ```bash
-curl -X POST https://web-six-iota-44.vercel.app/api/skills/safe-swap-execute/invoke \
+curl -X POST https://skillforge-vinaystwts-projects.vercel.app/api/skills/safe-swap-execute/invoke \
   -H "Content-Type: application/json" \
   -H "X-Payment: <payment-header>" \
   -d '{"fromToken": "OKB", "toToken": "USDT", "amount": "0.1"}'
