@@ -13,3 +13,4 @@ typechain-types
 pnpm-lock.yaml
 out
 context.md
+.vercel
