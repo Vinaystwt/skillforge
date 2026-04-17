@@ -33,36 +33,33 @@ SkillForge is three things working together:
 
 ```mermaid
 flowchart LR
-    subgraph Onchain["X Layer Mainnet"]
-        R[SkillRegistry.sol]
+    Creator([Creator]) -->|registerSkill tx| REG
+
+    subgraph Chain["X Layer Mainnet"]
+        REG[(SkillRegistry.sol)]
     end
 
-    subgraph Backend["SkillForge API (Next.js serverless)"]
-        M[/api/marketplace]
-        I[/api/skills/:slug/invoke]
-        A[/api/agent]
-        X402[x402 challenge middleware]
+    subgraph SF["SkillForge API"]
+        DISC[Discovery endpoint]
+        MKT[Marketplace]
+        INV[Invoke gateway]
+        CHAL[x402 middleware]
     end
 
     subgraph OKX["OKX Onchain OS"]
-        DEX[DEX quote API]
-        BAL[Wallet balance API]
-        RISK[Token risk API]
-        SWAP[Swap execution]
+        DEX[DEX Quotes]
+        BAL[Wallet Balances]
+        RISK[Token Risk]
     end
 
-    Creator -->|registerSkill tx| R
-    R -->|skill metadata| M
-    Agent -->|GET /api/agent| A
-    Agent -->|POST invoke| I
-    I -->|no payment header| X402
-    X402 -->|HTTP 402 + challenge| Agent
-    Agent -->|replay + X-Payment header| I
-    I --> DEX
-    I --> BAL
-    I --> RISK
-    I --> SWAP
-    I -->|result + receiptId| Agent
+    REG --> MKT
+    Client([Agent / Client]) -->|GET api/agent| DISC
+    Client -->|POST api/skills/invoke| INV
+    INV --> CHAL
+    CHAL -->|HTTP 402| Client
+    Client -->|replay + payment proof| INV
+    INV --> DEX & BAL & RISK
+    INV -->|result + receiptId| Client
 ```
 
 ---
@@ -78,14 +75,14 @@ sequenceDiagram
     participant O as OKX APIs
 
     A->>G: POST /api/skills/market-price-snapshot/invoke
-    G-->>A: HTTP 402 + X-Payment-Required: <base64 challenge>
+    G-->>A: HTTP 402 + PAYMENT-REQUIRED: base64-challenge
 
-    Note over A: Construct payment header<br/>using challenge payload
+    Note over A: Construct payment proof<br/>from challenge payload
 
-    A->>G: POST /api/skills/market-price-snapshot/invoke<br/>+ X-Payment: <signed payment>
+    A->>G: POST /api/skills/market-price-snapshot/invoke<br/>+ payment-signature: base64-proof
     G->>O: fetch live market data
     O-->>G: price data
-    G-->>A: HTTP 200 + { result, receiptId }
+    G-->>A: HTTP 200 + result + receiptId
 ```
 
 ---
