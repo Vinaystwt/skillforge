@@ -1,47 +1,44 @@
-import { activityFeed, marketplaceStats, skillListings, type SkillActivity, type SkillListing } from "./catalog";
+import {
+  activityFeed,
+  marketplaceStats,
+  skillListings,
+  type SkillActivity,
+  type SkillListing
+} from "./catalog";
 
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL ??
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3001");
-
-async function safeFetch<T>(path: string, fallback: T): Promise<T> {
-  try {
-    const response = await fetch(`${API_BASE}${path}`, {
-      next: { revalidate: 5 }
-    });
-
-    if (!response.ok) {
-      return fallback;
-    }
-
-    return (await response.json()) as T;
-  } catch {
-    return fallback;
-  }
-}
+/**
+ * On Vercel, we use internal Next.js API routes directly.
+ * Server components call lib/server/catalog.ts functions directly.
+ * This file provides safe client-side fallbacks with the seeded data.
+ */
 
 export async function getMarketplaceData() {
-  return safeFetch("/marketplace", {
+  // Server-side: call marketplace route via internal fetch
+  if (typeof window === "undefined") {
+    try {
+      const { getMarketplacePayload } = await import("./server/catalog");
+      return await getMarketplacePayload();
+    } catch {
+      // fallback to static data
+    }
+  }
+
+  return {
     stats: marketplaceStats,
     featured: skillListings.filter((skill) => skill.featured),
     skills: skillListings,
     activity: activityFeed
-  });
+  };
 }
 
 export async function getSkill(slug: string): Promise<SkillListing | null> {
-  return safeFetch(`/marketplace/skills/${slug}`, skillListings.find((skill) => skill.slug === slug) ?? null);
+  return skillListings.find((skill) => skill.slug === slug) ?? null;
 }
 
 export async function getSkills(): Promise<SkillListing[]> {
-  return safeFetch("/marketplace/skills", skillListings);
+  return skillListings;
 }
 
 export async function getActivity(): Promise<SkillActivity[]> {
-  const marketplace = await getMarketplaceData();
-  return marketplace.activity;
+  return activityFeed;
 }

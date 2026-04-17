@@ -1,87 +1,228 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getSkill } from "../../../lib/api";
-import { InvokePanel } from "../../../components/invoke-panel";
+import { getSkill, getMarketplaceData } from "../../../lib/api";
+import { InvokePanel } from "../../../components/new/invoke-panel";
+import { OnchainBadge } from "../../../components/new/onchain-badge";
 
-export default async function SkillDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+export const revalidate = 30;
+
+
+const CATEGORY_STYLES: Record<string, { text: string; bg: string }> = {
+  market:    { text: "#22D3EE", bg: "rgba(34,211,238,0.08)"  },
+  wallet:    { text: "#34D399", bg: "rgba(52,211,153,0.08)"  },
+  security:  { text: "#FBBF24", bg: "rgba(251,191,36,0.08)"  },
+  execution: { text: "#818CF8", bg: "rgba(129,140,248,0.08)" },
+  composite: { text: "#A78BFA", bg: "rgba(167,139,250,0.08)" }
+};
+
+function getCat(cat: string) {
+  return CATEGORY_STYLES[cat] ?? CATEGORY_STYLES.execution;
+}
+
+export default async function SkillDetailPage({
+  params
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
   const skill = await getSkill(slug);
 
-  if (!skill) {
-    notFound();
-  }
+  if (!skill) notFound();
+
+  const regTx = skill.registrationTx;
+  const cat = getCat(skill.category);
 
   return (
-    <main className="page-shell pt-10">
-      <section className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr]">
-        <div className="rounded-[2.2rem] border border-white/10 bg-[rgba(10,10,8,0.85)] p-1 shadow-shell">
-          <div className="rounded-[calc(2.2rem-4px)] border border-white/6 bg-[linear-gradient(150deg,rgba(16,15,12,0.95),rgba(10,10,8,0.96))] p-8 md:p-10">
-            <div className="eyebrow">{skill.category} / version {skill.version}</div>
-            <h1 className="mt-8 font-display text-[clamp(3rem,6vw,5rem)] leading-[0.94] text-fog">{skill.name}</h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-dune/75">{skill.longDescription}</p>
-            <div className="mt-10 flex flex-wrap gap-3">
-              {skill.tags.map((tag) => (
-                <span key={tag} className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs uppercase tracking-[0.2em] text-dune/70">
-                  {tag}
-                </span>
-              ))}
+    <div className="page-container">
+
+      {/* Back link */}
+      <div className="mb-8">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-sm forge-back-link"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M9 3L4 7L9 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          All skills
+        </Link>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
+
+        {/* ── LEFT: Skill detail ── */}
+        <div>
+
+          {/* Category + maturity */}
+          <div className="flex flex-wrap items-center gap-3 mb-5">
+            <span
+              className="text-xs font-semibold uppercase tracking-widest px-2.5 py-1 rounded-md"
+              style={{ color: cat.text, background: cat.bg }}
+            >
+              {skill.category}
+            </span>
+            <span className="forge-label">v{skill.version}</span>
+            {skill.maturity === "live"
+              ? <span className="forge-badge forge-badge-live"><span className="forge-dot forge-dot-live" />Live</span>
+              : <span className="forge-badge forge-badge-beta">{skill.maturity}</span>
+            }
+          </div>
+
+          {/* Title */}
+          <h1
+            className="forge-display mb-4"
+            style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}
+          >
+            {skill.name}
+          </h1>
+
+          {/* Description */}
+          <p
+            className="text-base leading-relaxed mb-8"
+            style={{ color: "var(--text-secondary)", maxWidth: "620px" }}
+          >
+            {skill.longDescription}
+          </p>
+
+          {/* Tags */}
+          <div className="flex flex-wrap gap-2 mb-8">
+            {skill.tags.map((tag) => (
+              <span
+                key={tag}
+                className="text-xs px-2.5 py-1 rounded-full"
+                style={{
+                  background: "var(--elevated)",
+                  border: "1px solid var(--border)",
+                  color: "var(--text-muted)"
+                }}
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+
+          {/* Stats grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
+            {[
+              { label: "Price per call", value: skill.priceLabel },
+              { label: "Invocations", value: skill.invocationCount.toLocaleString() },
+              { label: "Rating", value: `${skill.rating.toFixed(1)} / 5` },
+              { label: "Ratings", value: skill.ratingCount.toLocaleString() },
+              { label: "Invoke mode", value: skill.invokeMode },
+              { label: "Powered by", value: skill.backing }
+            ].map((s) => (
+              <div
+                key={s.label}
+                className="rounded-xl p-4"
+                style={{ background: "var(--surface)", border: "1px solid var(--border)" }}
+              >
+                <p className="forge-label mb-1.5">{s.label}</p>
+                <p className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
+                  {s.value}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Sample prompt */}
+          <div
+            className="rounded-xl p-4 mb-8"
+            style={{ background: "var(--elevated)", border: "1px solid var(--border)" }}
+          >
+            <p className="forge-label mb-2">Sample Agent Prompt</p>
+            <p className="text-sm italic" style={{ color: "var(--text-secondary)" }}>
+              "{skill.samplePrompt}"
+            </p>
+          </div>
+
+          {/* Invocation surface */}
+          <div
+            className="rounded-xl p-5 mb-8"
+            style={{ background: "var(--surface)", border: "1px solid rgba(99,102,241,0.2)" }}
+          >
+            <p className="forge-label mb-3">Invocation Surface</p>
+            <div className="space-y-2 text-sm">
+              <div className="flex gap-3">
+                <span style={{ color: "var(--text-muted)", width: "80px", flexShrink: 0 }}>Endpoint</span>
+                <code
+                  className="forge-mono text-xs px-2 py-0.5 rounded break-all min-w-0"
+                  style={{ background: "var(--elevated)", color: "var(--accent-light)" }}
+                >
+                  POST {skill.endpointPath}
+                </code>
+              </div>
+              <div className="flex gap-3">
+                <span style={{ color: "var(--text-muted)", width: "80px", flexShrink: 0 }}>Mode</span>
+                <span style={{ color: "var(--text-primary)" }}>{skill.invokeMode}</span>
+              </div>
+              <div className="flex gap-3">
+                <span style={{ color: "var(--text-muted)", width: "80px", flexShrink: 0 }}>Price</span>
+                <span style={{ color: "var(--payment)" }}>{skill.priceLabel} USDT</span>
+              </div>
             </div>
-            <div className="mt-12 grid gap-4 md:grid-cols-3">
-              <div className="rounded-[1.5rem] border border-white/8 bg-white/[0.03] p-5">
-                <p className="text-[10px] uppercase tracking-[0.25em] text-dune/45">Price</p>
-                <p className="mt-3 text-2xl text-fog">{skill.priceLabel}</p>
+          </div>
+
+          {/* Onchain provenance */}
+          {regTx && (
+            <div className="mb-8">
+              <p className="forge-label mb-3">Onchain Provenance</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <OnchainBadge
+                  label="Registration transaction"
+                  hash={regTx}
+                  type="tx"
+                />
+                <OnchainBadge
+                  label="Registry contract"
+                  hash="0x1850d2a31CB8669Ba757159B638DE19Af532ba5e"
+                  type="contract"
+                />
               </div>
-              <div className="rounded-[1.5rem] border border-white/8 bg-white/[0.03] p-5">
-                <p className="text-[10px] uppercase tracking-[0.25em] text-dune/45">Invocations</p>
-                <p className="mt-3 text-2xl text-fog">{skill.invocationCount.toLocaleString()}</p>
+              <p className="text-xs mt-2" style={{ color: "var(--text-muted)" }}>
+                Creator: {skill.creator.slice(0,10)}…{skill.creator.slice(-6)}
+              </p>
+            </div>
+          )}
+
+          {/* cURL example */}
+          <div>
+            <p className="forge-label mb-3">Agent Quick-start</p>
+            <div className="forge-terminal">
+              <div>
+                <span style={{ color: "#6B7FFF" }}># 1. Request (expect 402)</span>
               </div>
-              <div className="rounded-[1.5rem] border border-white/8 bg-white/[0.03] p-5">
-                <p className="text-[10px] uppercase tracking-[0.25em] text-dune/45">Backing</p>
-                <p className="mt-3 text-lg text-fog">{skill.backing}</p>
+              <div>curl -X POST https://web-six-iota-44.vercel.app{skill.endpointPath} \</div>
+              <div>  -H "Content-Type: application/json" \</div>
+              <div>  -d &#123;"amount": "{skill.slug === "wallet-balance-check" ? "" : "0.001"}"&#125;</div>
+              <div className="mt-3">
+                <span style={{ color: "#6B7FFF" }}># 2. Decode PAYMENT-REQUIRED header, build payment-signature, retry</span>
               </div>
             </div>
           </div>
         </div>
-        <aside className="space-y-6">
+
+        {/* ── RIGHT: Invoke panel + links ── */}
+        <div className="space-y-4">
           <InvokePanel skill={skill} />
-          <div className="rounded-[2rem] border border-white/10 bg-[rgba(12,12,10,0.86)] p-1 shadow-shell">
-            <div className="rounded-[calc(2rem-4px)] border border-white/6 bg-[rgba(16,15,13,0.96)] p-6">
-              <p className="text-[10px] uppercase tracking-[0.26em] text-dune/50">Invocation surface</p>
-              <h2 className="mt-4 font-display text-3xl text-fog">Ready for x402-paid execution</h2>
-              <p className="mt-4 text-sm leading-7 text-dune/74">
-                Endpoint: <span className="text-fog">{skill.endpointPath}</span>
-              </p>
-              <p className="mt-2 text-sm leading-7 text-dune/74">Sample prompt: {skill.samplePrompt}</p>
-              <Link
-                href="/demo"
-                className="mt-8 inline-flex items-center gap-3 rounded-full border border-white/10 bg-fog px-5 py-3 text-sm uppercase tracking-[0.2em] text-ink transition duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-[2px]"
-              >
-                Run demo flow
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-ink text-fog">↗</span>
+
+          <div className="forge-card p-5">
+            <p className="forge-label mb-2">Quick Actions</p>
+            <div className="space-y-2">
+              <Link href="/demo" className="forge-btn forge-btn-secondary text-xs w-full justify-center">
+                Run full demo flow
               </Link>
+              <a
+                href="https://www.oklink.com/xlayer/address/0x1850d2a31CB8669Ba757159B638DE19Af532ba5e#code"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="forge-btn forge-btn-secondary text-xs w-full justify-center"
+              >
+                Registry on OKLink ↗
+              </a>
             </div>
           </div>
-          <div className="rounded-[2rem] border border-white/10 bg-[rgba(12,12,10,0.86)] p-1 shadow-shell">
-            <div className="rounded-[calc(2rem-4px)] border border-white/6 bg-[rgba(16,15,13,0.96)] p-6">
-              <p className="text-[10px] uppercase tracking-[0.26em] text-dune/50">Creator stats</p>
-              <div className="mt-6 space-y-4">
-                <div className="flex items-center justify-between text-sm text-dune/74">
-                  <span>Creator</span>
-                  <span className="text-fog">{skill.creator.slice(0, 8)}...{skill.creator.slice(-4)}</span>
-                </div>
-                <div className="flex items-center justify-between text-sm text-dune/74">
-                  <span>Rating</span>
-                  <span className="text-fog">{skill.rating.toFixed(1)} / 5 from {skill.ratingCount}</span>
-                </div>
-                <div className="flex items-center justify-between text-sm text-dune/74">
-                  <span>Status</span>
-                  <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs uppercase tracking-[0.2em] text-emerald-200">Active</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </aside>
-      </section>
-    </main>
+        </div>
+      </div>
+    </div>
   );
 }

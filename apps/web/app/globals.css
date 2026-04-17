@@ -2,10 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─────────────────────────────────────────
+   Design Tokens
+───────────────────────────────────────── */
 :root {
   color-scheme: dark;
+
+  --bg: #04050E;
+  --surface: #0A0B18;
+  --elevated: #0F1024;
+  --border: rgba(99,102,241,0.15);
+  --border-strong: rgba(99,102,241,0.35);
+  --border-subtle: rgba(255,255,255,0.06);
+
+  --text-primary: #E8EDFF;
+  --text-secondary: #8892B8;
+  --text-muted: #4A5280;
+
+  --accent: #6366F1;
+  --accent-light: #818CF8;
+  --accent-glow: rgba(99,102,241,0.18);
+
+  --live: #10D9A0;
+  --live-dim: rgba(16,217,160,0.1);
+  --payment: #F59E0B;
+  --payment-dim: rgba(245,158,11,0.1);
+  --danger: #F43F5E;
+  --danger-dim: rgba(244,63,94,0.1);
+
+  --font-outfit: "Outfit", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
 }
 
+/* ─────────────────────────────────────────
+   Base Reset
+───────────────────────────────────────── */
 * {
   box-sizing: border-box;
 }
@@ -14,90 +50,393 @@ html {
   scroll-behavior: smooth;
 }
 
+/* ─────────────────────────────────────────
+   Body
+───────────────────────────────────────── */
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top left, rgba(193, 109, 69, 0.18), transparent 25%),
-    radial-gradient(circle at 80% 10%, rgba(231, 225, 214, 0.08), transparent 20%),
-    linear-gradient(180deg, #11100d, #090907 58%, #11100d);
-  color: #e7e1d6;
-  font-family: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-outfit);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* Dot-grid texture */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: 140px 140px;
-  mask-image: radial-gradient(circle at center, black, transparent 75%);
-  opacity: 0.28;
-  animation: pulse-grid 8s ease-in-out infinite;
+  background-image: radial-gradient(
+    circle,
+    rgba(99,102,241,0.07) 1px,
+    transparent 1px
+  );
+  background-size: 28px 28px;
+  z-index: 0;
 }
 
+/* Radial accent glow at top */
 body::after {
   content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
-  background-image: radial-gradient(rgba(255,255,255,0.2) 0.5px, transparent 0.5px);
-  background-size: 4px 4px;
-  opacity: 0.04;
+  background: radial-gradient(
+    ellipse 80% 50% at 50% -5%,
+    rgba(99,102,241,0.09) 0%,
+    transparent 70%
+  );
+  z-index: 0;
 }
 
-.page-shell {
-  width: min(1120px, calc(100% - 24px));
+/* ─────────────────────────────────────────
+   Layout
+───────────────────────────────────────── */
+.page-container {
+  position: relative;
+  z-index: 1;
+  width: min(1240px, calc(100% - 32px));
   margin: 0 auto;
   padding: 2rem 0 6rem;
 }
 
-.eyebrow {
+/* ─────────────────────────────────────────
+   Typography Utilities
+───────────────────────────────────────── */
+.forge-display {
+  font-family: var(--font-outfit);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  color: var(--text-primary);
+}
+
+.forge-heading {
+  font-family: var(--font-outfit);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--text-primary);
+}
+
+.forge-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.forge-mono {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* ─────────────────────────────────────────
+   Cards
+───────────────────────────────────────── */
+.forge-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.forge-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 1px rgba(99,102,241,0.1), 0 8px 40px rgba(0,0,0,0.5);
+}
+
+/* ─────────────────────────────────────────
+   Buttons
+───────────────────────────────────────── */
+.forge-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.05);
-  padding: 0.55rem 0.9rem;
-  font-size: 10px;
-  letter-spacing: 0.28em;
+  gap: 8px;
+  font-family: var(--font-outfit);
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.forge-btn-primary {
+  background: var(--accent);
+  color: white;
+  padding: 10px 20px;
+  box-shadow: 0 2px 12px rgba(99,102,241,0.3);
+}
+
+.forge-btn-primary:hover {
+  background: #7C7FF5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 24px rgba(99,102,241,0.4);
+}
+
+.forge-btn-primary:active {
+  transform: translateY(0);
+}
+
+.forge-btn-secondary {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 10px 20px;
+  border: 1px solid var(--border);
+}
+
+.forge-btn-secondary:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+  background: rgba(99,102,241,0.06);
+}
+
+.forge-btn-ghost {
+  background: transparent;
+  color: var(--accent-light);
+  padding: 8px 16px;
+  border: 1px solid rgba(99,102,241,0.22);
+}
+
+.forge-btn-ghost:hover {
+  background: rgba(99,102,241,0.08);
+  border-color: rgba(99,102,241,0.4);
+}
+
+/* ─────────────────────────────────────────
+   Badges
+───────────────────────────────────────── */
+.forge-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: rgba(231, 225, 214, 0.72);
 }
 
-.hero-copy {
+.forge-badge-live {
+  background: var(--live-dim);
+  color: var(--live);
+  border: 1px solid rgba(16,217,160,0.2);
+}
+
+.forge-badge-executed {
+  background: var(--accent-glow);
+  color: var(--accent-light);
+  border: 1px solid rgba(99,102,241,0.25);
+}
+
+.forge-badge-paid {
+  background: var(--payment-dim);
+  color: var(--payment);
+  border: 1px solid rgba(245,158,11,0.2);
+}
+
+.forge-badge-failed {
+  background: var(--danger-dim);
+  color: var(--danger);
+  border: 1px solid rgba(244,63,94,0.2);
+}
+
+.forge-badge-beta {
+  background: rgba(251,191,36,0.1);
+  color: #FBB840;
+  border: 1px solid rgba(251,191,36,0.2);
+}
+
+/* ─────────────────────────────────────────
+   Status Dots
+───────────────────────────────────────── */
+.forge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.forge-dot-live {
+  background: var(--live);
+  box-shadow: 0 0 7px rgba(16,217,160,0.6);
+  animation: forgePulse 2.5s ease-in-out infinite;
+}
+
+.forge-dot-accent {
+  background: var(--accent);
+  box-shadow: 0 0 7px rgba(99,102,241,0.6);
+}
+
+.forge-dot-payment {
+  background: var(--payment);
+  box-shadow: 0 0 7px rgba(245,158,11,0.5);
+}
+
+.forge-dot-error {
+  background: var(--danger);
+}
+
+/* ─────────────────────────────────────────
+   Inputs
+───────────────────────────────────────── */
+.forge-input {
+  width: 100%;
+  background: var(--elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-family: var(--font-outfit);
+  font-size: 14px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  appearance: none;
+}
+
+.forge-input::placeholder {
+  color: var(--text-muted);
+}
+
+.forge-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.14);
+}
+
+.forge-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* ─────────────────────────────────────────
+   Terminal / Code
+───────────────────────────────────────── */
+.forge-terminal {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.75;
+  background: #020308;
+  border: 1px solid rgba(99,102,241,0.15);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  color: #B0BAE8;
+  overflow: auto;
+  max-height: 340px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* ─────────────────────────────────────────
+   OKLink Contract Footer Link
+───────────────────────────────────────── */
+.oklink-contract-link {
+  color: var(--text-muted);
+  transition: color 0.15s ease;
+}
+
+.oklink-contract-link:hover {
+  color: var(--accent-light);
+}
+
+/* ─────────────────────────────────────────
+   Back / Muted Hover Links
+───────────────────────────────────────── */
+.forge-back-link {
+  color: var(--text-muted);
+  transition: color 0.15s ease;
+}
+
+.forge-back-link:hover {
+  color: var(--accent-light);
+}
+
+/* ─────────────────────────────────────────
+   OKLink Badge
+───────────────────────────────────────── */
+.oklink-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: rgba(99,102,241,0.08);
+  border: 1px solid rgba(99,102,241,0.2);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent-light);
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+  word-break: break-all;
+}
+
+.oklink-badge:hover {
+  background: rgba(99,102,241,0.14);
+  border-color: rgba(99,102,241,0.35);
+  color: #A5ADFF;
+}
+
+/* ─────────────────────────────────────────
+   Reveal Animations
+───────────────────────────────────────── */
+.forge-reveal {
   opacity: 0;
-  transform: translate3d(0, 18px, 0);
-  animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: forgeUp 0.55s cubic-bezier(0.22,1,0.36,1) forwards;
 }
 
-.hero-copy:nth-child(2) {
-  animation-delay: 120ms;
+.forge-reveal-1 { animation-delay: 0ms;   }
+.forge-reveal-2 { animation-delay: 80ms;  }
+.forge-reveal-3 { animation-delay: 160ms; }
+.forge-reveal-4 { animation-delay: 240ms; }
+.forge-reveal-5 { animation-delay: 320ms; }
+
+/* ─────────────────────────────────────────
+   Keyframes
+───────────────────────────────────────── */
+@keyframes forgeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.hero-copy:nth-child(3) {
-  animation-delay: 220ms;
+@keyframes forgePulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
 }
 
-@keyframes rise {
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
+@keyframes flowPulse {
+  0%   { left: -4px; opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { left: calc(100% + 4px); opacity: 0; }
 }
 
+/* ─────────────────────────────────────────
+   Scrollbar
+───────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb {
+  background: rgba(99,102,241,0.25);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(99,102,241,0.4); }
+
+/* ─────────────────────────────────────────
+   Reduced Motion
+───────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
-  *,
-  *::before,
-  *::after {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
